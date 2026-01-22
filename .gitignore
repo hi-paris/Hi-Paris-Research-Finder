@@ -1,0 +1,4 @@
+# Conda envs
+env/
+.conda/
+*.yml
