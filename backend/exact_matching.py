@@ -13,9 +13,10 @@ def exact_match(query, df):
     q = query.strip().lower()
 
     matched_df = df[
-        df["Research domains"].apply(lambda ds: any(q in d for d in ds))
+        df["Research domains"].apply(
+            lambda ds: any(q in d.lower().strip() or d.lower().strip() in q for d in ds)
+        )
     ]
 
     return matched_df.reset_index(drop=True)
-
 
