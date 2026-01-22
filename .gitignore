@@ -2,3 +2,8 @@
 env/
 .conda/
 *.yml
+
+venv/
+.env/
+.env.*
+.venv/

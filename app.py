@@ -3,6 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import ast
+
 
 # ROOT DIR pour import backend
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -14,14 +16,13 @@ from backend.semantic_search import semantic_search_filtered
 # Page configuration
 st.set_page_config(
     page_title="Hi! Paris Research Profiles",
-    page_icon=r"frontend/logo/icon_hi_search.png",
+    page_icon=r"logo/icon_hi_search.png",
     layout="wide",
 )
 
 # Load data
 file_path = "data/prof_ecosystem_01_21.xlsx"
 df = pd.read_excel(file_path)
-import ast
 
 # Processing
 df["Research domains"] = df["Research domains"].apply(ast.literal_eval)
@@ -34,7 +35,7 @@ st.markdown("""
     """)
 
 # Sidebar options
-st.sidebar.image(r"frontend\logo\logo_hi_paris.png", width=300)
+st.sidebar.image(r"logo/logo_hi_paris.png", width=300)
 st.sidebar.header("Options")
 show_exact = st.sidebar.checkbox("Show exact matches", value=True)
 show_suggestions = st.sidebar.checkbox("Show suggestions", value=False)
