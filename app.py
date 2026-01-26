@@ -63,7 +63,6 @@ query = st.text_input(
 
 
 # Main
-# Main
 if not query:
     # Case 1: No research domain, but affiliation selected
     if selected_affiliations:
@@ -87,6 +86,21 @@ if not query:
     # Optional: no query & no affiliation
     else:
         st.info("Please enter a research domain or select an affiliation.")
+        st.subheader("All Researchers list")
+        st.dataframe(
+            df[
+                [
+                    "Last name",
+                    "First name",
+                    "Affiliation",
+                    "Research axis",
+                    "Research domains",
+                    "Summary",
+                ]
+            ],
+            width="stretch",
+)
+
 
 else:
     # Existing behavior (unchanged)
