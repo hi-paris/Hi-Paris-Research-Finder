@@ -63,11 +63,38 @@ query = st.text_input(
 
 
 # Main
-if query:
+# Main
+if not query:
+    # Case 1: No research domain, but affiliation selected
+    if selected_affiliations:
+        df_filtered = df[df["Affiliation"].isin(selected_affiliations)]
+
+        st.subheader("Researchers by affiliation")
+        st.dataframe(
+            df_filtered[
+                [
+                    "Last name",
+                    "First name",
+                    "Affiliation",
+                    "Research axis",
+                    "Research domains",
+                    "Summary",
+                ]
+            ],
+            width="stretch",
+        )
+
+    # Optional: no query & no affiliation
+    else:
+        st.info("Please enter a research domain or select an affiliation.")
+
+else:
+    # Existing behavior (unchanged)
     if selected_affiliations:
         df_filtered = df[df["Affiliation"].isin(selected_affiliations)]
     else:
         df_filtered = df
+
     # Exact match
     exact_results = exact_match(query, df_filtered)
     exact_ids = set(exact_results["ID"].tolist()) if not exact_results.empty else set()
@@ -94,7 +121,11 @@ if query:
     # Suggestions
     if show_suggestions:
         suggestions = semantic_search_filtered(
-            query=query, df=df_filtered, exact_ids=exact_ids, top_k=10, threshold=0.4
+            query=query,
+            df=df_filtered,
+            exact_ids=exact_ids,
+            top_k=10,
+            threshold=0.4,
         )
 
         if not suggestions.empty:
