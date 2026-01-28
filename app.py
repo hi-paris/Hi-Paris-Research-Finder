@@ -21,7 +21,7 @@ st.set_page_config(
 )
 
 # Load data
-file_path = "data/prof_ecosystem_01_21.xlsx"
+file_path = "data/professor_profile_28_01.xlsx"
 df = pd.read_excel(file_path)
 
 # Processing
