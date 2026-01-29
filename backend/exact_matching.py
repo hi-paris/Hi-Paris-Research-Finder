@@ -1,6 +1,9 @@
 # backend/matching.py
 import pandas as pd
 
+# backend/matching.py
+import pandas as pd
+
 
 def normalize(text):
     if pd.isna(text):
@@ -19,4 +22,3 @@ def exact_match(query, df):
     ]
 
     return matched_df.reset_index(drop=True)
-

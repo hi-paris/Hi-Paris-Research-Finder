@@ -2,8 +2,11 @@
 env/
 .conda/
 *.yml
-
+*.pkl
+*.faiss
+*.xlsx
 venv/
 .env/
 .env.*
 .venv/
+*.pyc
