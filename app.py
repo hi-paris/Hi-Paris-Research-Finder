@@ -49,8 +49,8 @@ def build_prof_text(row):
     domains = row["Research domains"]
     domains_text = ", ".join(domains) if isinstance(domains, list) else str(domains)
     return (
-        f"passage: Research domains: {domains_text}. "
-        f"Summary: {row.get('Summary', '')}"
+        f"passage: Research domains fields: {domains_text}. "
+        f"Summary of the professor: {row.get('Summary', '')}"
     )
 
 
