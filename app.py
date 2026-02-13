@@ -30,9 +30,6 @@ excel_hash = file_hash(file_path)
 df["Research domains"] = df["Research domains"].apply(ast.literal_eval)
 df = df[df["Research axis"] != "not found"].reset_index(drop=True)
 
-df["Profile"] = df["Personal webpage"].apply(
-    lambda x: f'<a href="{x}" target="_blank">Visit</a>' if pd.notna(x) else ""
-)
 # Options for filters
 affiliations = df["Affiliation"].dropna().unique().tolist()
 research_axis_options = df["Research axis"].dropna().unique().tolist()
