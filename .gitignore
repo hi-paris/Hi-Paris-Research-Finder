@@ -9,3 +9,5 @@ venv/
 .env.*
 .venv/
 *.pyc
+
+.streamlit/secrets.toml

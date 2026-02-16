@@ -7,13 +7,6 @@ import pandas as pd
 import streamlit as st
 from sentence_transformers import SentenceTransformer
 
-
-# Hash function
-def file_hash(path):
-    with open(path, "rb") as f:
-        return hashlib.md5(f.read()).hexdigest()
-
-
 # Page config
 st.set_page_config(
     page_title="Hi! Paris Research Profiles",
@@ -21,10 +14,51 @@ st.set_page_config(
     layout="wide",
 )
 
+
+def check_password():
+    def password_entered():
+        if st.session_state["password"] == st.secrets["APP_PASSWORD"]:
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]
+        else:
+            st.session_state["password_correct"] = False
+
+    if "password_correct" not in st.session_state:
+        st.text_input(
+            "Enter password",
+            type="password",
+            key="password",
+            on_change=password_entered,
+        )
+        return False
+    elif not st.session_state["password_correct"]:
+        st.text_input(
+            "Enter password",
+            type="password",
+            key="password",
+            on_change=password_entered,
+        )
+        st.error("😕 Incorrect password")
+        return False
+    else:
+        return True
+
+
+if not check_password():
+    st.stop()
+
+
+# Hash function
+def file_hash(data):
+    # Convert DataFrame to CSV bytes
+    csv_bytes = data.to_csv(index=False).encode()
+    return hashlib.md5(csv_bytes).hexdigest()
+
+
 # Load data
-file_path = r"data/Hi_Paris_affiliated_professors.xlsx"
-df = pd.read_excel(file_path)
-excel_hash = file_hash(file_path)
+csv_url = st.secrets["google_sheet_url"]
+df = pd.read_csv(csv_url)
+excel_hash = file_hash(df)
 
 
 df["Research domains"] = df["Research domains"].apply(ast.literal_eval)
