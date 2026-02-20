@@ -15,7 +15,12 @@ st.set_page_config(
 )
 
 
+# Password function
 def check_password():
+    """
+    Simple password gate using Streamlit secrets.
+    """
+
     def password_entered():
         if st.session_state["password"] == st.secrets["APP_PASSWORD"]:
             st.session_state["password_correct"] = True
@@ -38,19 +43,21 @@ def check_password():
             key="password",
             on_change=password_entered,
         )
-        st.error("😕 Incorrect password")
+        st.error("Incorrect password")
         return False
     else:
         return True
 
 
+# check password
 if not check_password():
     st.stop()
 
 
-# Hash function
 def file_hash(data):
-    # Convert DataFrame to CSV bytes
+    """
+    Hash function used to detect whether we need to rebuild the FAISS index.
+    """
     csv_bytes = data.to_csv(index=False).encode()
     return hashlib.md5(csv_bytes).hexdigest()
 
@@ -60,11 +67,10 @@ csv_url = st.secrets["google_sheet_url"]
 df = pd.read_csv(csv_url)
 excel_hash = file_hash(df)
 
-
+# Transfer Research domains into a list
 df["Research domains"] = df["Research domains"].apply(ast.literal_eval)
-df = df[df["Research axis"] != "not found"].reset_index(drop=True)
 
-# Options for filters
+# Drop rows that contain missing values
 affiliations = df["Affiliation"].dropna().unique().tolist()
 research_axis_options = df["Research axis"].dropna().unique().tolist()
 
@@ -78,7 +84,7 @@ def load_model():
 model = load_model()
 
 
-# Load FAISS index
+# EMBEDDINGS / FAISS
 def build_prof_text(row):
     domains = row["Research domains"]
     domains_text = ", ".join(domains) if isinstance(domains, list) else str(domains)
@@ -101,7 +107,6 @@ try:
     index = faiss.read_index("professor_index.faiss")
 
 except Exception:
-    # st.warning("Rebuilding FAISS index…")
     df_copy = df.copy()
     ids = df_copy["ID"].tolist()
     texts = [build_prof_text(row) for _, row in df_copy.iterrows()]
@@ -154,8 +159,6 @@ def semantic_search_fast(
 ):
     if exact_ids is None:
         exact_ids = set()
-
-    # q_emb = model.encode([f"query: {query}"], normalize_embeddings=True)
     q_emb = model.encode(
         [f"query: professor working on {query}"], normalize_embeddings=True
     )
@@ -209,12 +212,14 @@ st.markdown(
         "affiliated with Hi! Paris."
     )
 )
+
+# Sidebar
 st.sidebar.image(r"logo/logo_hi_paris.png", width=300)
 st.sidebar.header("Options")
-
 show_exact = st.sidebar.checkbox("Show exact matches", value=True)
 show_suggestions = st.sidebar.checkbox("Show suggestions", value=True)
 
+# Query
 query = st.text_input(
     "Enter a research domain:",
     placeholder="e.g. optimal transport, time series, computer vision",
@@ -234,8 +239,8 @@ with col2:
 
 # Main logic
 df_filtered = apply_filters(df, selected_affiliations, selected_research_axis)
-
 if not query:
+    # Apply filtered
     if df_filtered.empty:
         st.info("No researchers match the selected filters.")
     else:
@@ -261,6 +266,7 @@ if not query:
             },
         )
 else:
+    # Exact Match
     exact_results = exact_match(query, df_filtered)
     exact_results.index += 1
     exact_ids = set(exact_results["ID"].tolist()) if not exact_results.empty else set()
@@ -290,6 +296,7 @@ else:
             )
 
     if show_suggestions:
+        # Suggestions
         suggestions = semantic_search_fast(
             query,
             exact_ids=exact_ids,
