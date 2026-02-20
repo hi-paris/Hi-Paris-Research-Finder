@@ -6,19 +6,37 @@ The Hi! Paris Expert Finder platform is a smart research engine designed to sear
 
 ## Installation
 
-Clone the repository:
+## 1. Install uv (if not already installed):
+
+```bash
+pip install uv
+```
+
+## 2. Clone the repository:
 
 ```bash
 git clone https://github.com/hi-paris/Hi-Paris-Research-Finder.git
-cd hi-paris-expert-finder
+cd Hi-Paris-Research-Finder
 ```
+## 3. Create and activate the virtual environment: 
 
-Install dependencies:
+- Create a uv virtual environment
 
 ```bash
-pip install -r requirements.txt
+uv venv
 ```
 
+- Activate it:
+
+```bash
+.\.venv\Scripts\activate
+```
+
+## 4. Install dependencies from pyproject.toml: 
+
+```bash
+uv sync
+```
 ---
 
 ## Configuration
@@ -35,7 +53,7 @@ google_sheet_url="link_to_csv_list"
 ## Run the App
 
 ```bash
-streamlit run app.py
+python -m streamlit run app.py
 ```
 
 ---
@@ -44,13 +62,14 @@ streamlit run app.py
 
 ```
 .
-├── app.py
+├── app.py             
+├── search.py         
+├── utils.py            
+├── pyproject.toml     
 ├── logo/
 │   ├── icon_hi_search.png
-│   └── logo_hi_paris.png         
-├── requirements.txt
+│   └── logo_hi_paris.png
 └── README.md
 ```
-
 ---
 
