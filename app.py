@@ -18,7 +18,6 @@ st.set_page_config(
     layout="wide",
 )
 
-
 # =============================================================================
 # AUTH
 # =============================================================================
@@ -31,10 +30,20 @@ def check_password():
             st.session_state["password_correct"] = False
 
     if "password_correct" not in st.session_state:
-        st.text_input("Enter password", type="password", key="password", on_change=password_entered)
+        st.text_input(
+            "Enter password",
+            type="password",
+            key="password",
+            on_change=password_entered,
+        )
         return False
     elif not st.session_state["password_correct"]:
-        st.text_input("Enter password", type="password", key="password", on_change=password_entered)
+        st.text_input(
+            "Enter password",
+            type="password",
+            key="password",
+            on_change=password_entered,
+        )
         st.error("Incorrect password")
         return False
     else:
@@ -75,31 +84,79 @@ query = st.text_input("Enter a research domain:")
 col1, col2 = st.columns(2)
 
 with col1:
-    selected_affiliations = st.multiselect("Filter by affiliation:", options=affiliations)
+    selected_affiliations = st.multiselect(
+        "Filter by affiliation:", options=affiliations
+    )
 
 with col2:
-    selected_research_axis = st.multiselect("Filter by Research axis:", options=research_axis_options)
+    selected_research_axis = st.multiselect(
+        "Filter by Research axis:", options=research_axis_options
+    )
 
 
 # =============================================================================
 # LOGIC
 # =============================================================================
+# Main logic
 df_filtered = apply_filters(df, selected_affiliations, selected_research_axis)
 
 if not query:
     if df_filtered.empty:
         st.info("No researchers match the selected filters.")
     else:
-        st.dataframe(df_filtered)
+        df_filtered.index += 1
+        st.subheader("Researchers")
+        st.dataframe(
+            df_filtered[
+                [
+                    "Last name",
+                    "First name",
+                    "Affiliation",
+                    "Research axis",
+                    "Research domains",
+                    "Summary",
+                    "Personal webpage",
+                ]
+            ],
+            width="stretch",
+            column_config={
+                "Personal webpage": st.column_config.LinkColumn(
+                    display_text=r"https?://(.*)$"
+                )
+            },
+        )
 else:
     exact_results = exact_match(query, df_filtered)
+    exact_results.index += 1
     exact_ids = set(exact_results["ID"].tolist()) if not exact_results.empty else set()
-
     if show_exact:
         st.subheader("Exact matches")
-        st.dataframe(exact_results)
+        if exact_results.empty:
+            st.info("No exact match found")
+        else:
+            st.dataframe(
+                exact_results[
+                    [
+                        "Last name",
+                        "First name",
+                        "Affiliation",
+                        "Research axis",
+                        "Research domains",
+                        "Summary",
+                        "Personal webpage",
+                    ]
+                ],
+                width="stretch",
+                column_config={
+                    "Personal webpage": st.column_config.LinkColumn(
+                        display_text=r"https?://(.*)$"
+                    )
+                },
+            )
 
     if show_suggestions:
+
+        
         suggestions = semantic_search_fast(
             query,
             model,
@@ -108,7 +165,22 @@ else:
             ids,
             exact_ids=exact_ids,
             allowed_axes=selected_research_axis,
-        )
+            allowed_affiliations=selected_affiliations
 
+        )
+        
+        
+        suggestions.index += 1
         st.subheader("Suggestions")
-        st.dataframe(suggestions)
+        if suggestions.empty:
+            st.info("No suggestions found")
+        else:
+            st.dataframe(
+                suggestions,
+                width="stretch",
+                column_config={
+                    "Personal webpage": st.column_config.LinkColumn(
+                        display_text=r"https?://(.*)$"
+                    )
+                },
+            )
